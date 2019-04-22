@@ -16,12 +16,13 @@
   <body>
 
     <div class="input">
-      <form id='ticker' method='post' action='index' >
-	<span id="ticklab">Ticker symbol:</span>
-	<input type='text' name='ticker_text' />
-	<input type='submit' value='▶' />
+      <form id='next' method='post' action='index' >
+        <span id="nextprofile">Next Profile:</span> 
+	<input type='submit' value='▶' /><br>
+	<input type='checkbox' name='liked_image' />Like<br>
       </form>
     </div>
+
 
     {{ bokeh_div|indent(4)|safe }}
     

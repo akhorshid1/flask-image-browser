@@ -1,4 +1,5 @@
 import requests
+import random
 import os
 import pandas as pd
 import numpy as np
@@ -12,104 +13,36 @@ from bokeh.embed import components
 
 app = Flask(__name__)
 
-# api key is retrieved from config vars to be kept safe:
-apikey = os.environ.get('API_KEY')
+files = os.listdir('data/') # os.listdir does not sort files
+files = sorted(files) 
+del files[0]
 
-urlhead = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol='
-urldate = '&date='
-urltail = '&apikey=' + apikey
+likes = ['first image']
+image_sequence = []
 
+def choose_random():
+    X = random.randint(0, len(files))
+    image_name = files[X]
+    return image_name 
+
+def save_image_sequence(image_file):
+    image_sequence.append(image_file)
     
-monthago = date.today() + relativedelta(years=-1)
-date = monthago.strftime("%Y-%m-%d")
+def save_likes(image_sequence):
+    likes.append(image_sequence)
 
-def get_ticker(ticker):
-     
-    # Retrieve and process data:
-    url = urlhead + ticker + urltail    
+def bokehplot(image_name):
     
-    try:
-        page = requests.get(url)
-        json = page.json()
-    except ValueError:
-        return pd.DataFrame()
-    df = pd.DataFrame(json['Time Series (Daily)'])
-    
-    # New DataFrame to append values:
-    df_1 = pd.DataFrame()
-    close = np.asarray(df.iloc[3])
-    
-    df_1['date'] = pd.to_datetime(list(df))
-    df_1['close'] = close
-    
-    # Last 30 days:
-    df_1 = df_1[0:30]
-    
-    # Create a new column with dates and close as string:
-    df_1['date_str'] = df_1['date'].map(lambda x: x.strftime("%Y-%m-%d"))
-    
-    return df_1
-
-def bokehplot(df_1, ticker):
-
-    """Create a time-series line plot in Bokeh."""
-    p = figure(width=600, height=300, title=ticker.upper(), tools="")
-    
-
-    hover = HoverTool(tooltips = """
-    <div>
-    <table>
-    <tr><td class="ttlab">Date:</td><td>@date_str</td></tr>
-    <tr><td class="ttlab">Close:</td><td>@close</td></tr>
-    </table>
-    </div>
-    """)
-    
-    hover.mode = 'vline'
-    hover.line_policy = 'nearest'
-    p.add_tools(hover)
-
-    crosshair = CrosshairTool()
-    crosshair.dimensions = 'height'
-    crosshair.line_color = "#ffffff"
-    p.add_tools(crosshair)
-
-    dfcds = ColumnDataSource(df_1)
-    p.line('date', 'close', source = dfcds, color="#44ddaa")
-
-    p.xaxis.formatter=DatetimeTickFormatter(days=["%d %b"])
-    p.x_range=Range1d(df_1['date'].min(), df_1['date'].max())
-
-    p.toolbar.logo = None
-    p.toolbar_location = None
-
-    # Style plot
-    p.background_fill_color = "#234567"
-    p.border_fill_color = "#234567"
-    p.title.text_color = "#ffffff"
-    p.title.text_font_size = "1.25em"
-    p.axis.major_label_text_color = "#ffffff"
-    p.axis.major_label_text_font_size = "0.875em"
-    p.axis.axis_line_color = "#ffffff"
-    p.axis.major_tick_line_color = "#ffffff"
-    p.axis.minor_tick_line_color = "#ffffff"
-    p.xgrid.grid_line_color = None
-    p.ygrid.grid_line_alpha = 0.5
-    p.ygrid.grid_line_dash = [4, 6]
-    p.outline_line_color = None
-    p.yaxis.axis_label = "Closing price"
-    p.yaxis.axis_label_text_color = "#ffffff"
-    p.yaxis.axis_label_text_font_size = "1em"
-    p.yaxis.axis_label_text_font_style = "normal"
-    p.yaxis.axis_label_standoff = 12
-    
-    im = Image.open('data/image1.jpg')
+    im = Image.open('data/' + image_name)
     im = im.convert("RGBA")
     imarray = np.array(im)
-    plot = figure(x_range=(0,10), y_range=(0,1), plot_width=400, plot_height=400)
-    plot.image_rgba(image=[imarray], x=0, y=0, dw=10, dh=1)
+    imarray = imarray[::-1]
+    plot = figure(x_range=(0,1), y_range=(0,1), plot_width=400, plot_height=400, title=likes[-1])
+    plot.image_rgba(image=[imarray], x=0, y=0, dw=1, dh=1)
     
     return plot
+
+
 
 def invalid():
     error = None
@@ -129,17 +62,14 @@ def index():
     if request.method == 'GET':
         return render_template('index.html', bokeh_script="", bokeh_div="")
     else:
-#        tick = request.form['ticker_text']
-        tick = request.form.get('ticker_text')
-        if not tick.isalpha():
-        # isalpha() returns 'True' if all characters in the str are alphabets
-#            abort(404)
-            return invalid()
-        ticker_df = get_ticker(tick)
-        if ticker_df.empty:
-            return invalid()
+#        image = request.form.get('image_text')
+        image_file = choose_random()
+        save_image_sequence(image_file)
         
-        fig = bokehplot(ticker_df, tick)
+        if request.form.get("liked_image"):
+            save_likes(image_sequence[-2])
+        
+        fig = bokehplot(image_file)
         script, div = components(fig)
         return render_template(
             'index.html',
