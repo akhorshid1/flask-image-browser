@@ -42,8 +42,6 @@ def bokehplot(image_name):
     
     return plot
 
-
-
 def invalid():
     error = None
     with open("static/error.html") as err:
