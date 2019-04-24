@@ -16,13 +16,16 @@
   <body>
 
     <div class="input">
-      <form id='next' method='post' action='index' >
+      <form id='next' method='post' action='index'>
+        	<select name='gender' required>
+          <option value="men" {% if gender =="men" %} selected {% endif %} >Men</option>
+          <option value="women" {% if gender =="women" %} selected {% endif %} >Women</option>
+        </select><br>
         <span id="nextprofile">Next Profile:</span> 
-	<input type='submit' value='▶' /><br>
-	<input type='checkbox' name='liked_image' />Like<br>
+        	<input type='submit' value='▶' /><br>
+        Like	<input type='checkbox' name='liked_image' /><br>
       </form>
     </div>
-
 
     {{ bokeh_div|indent(4)|safe }}
     
