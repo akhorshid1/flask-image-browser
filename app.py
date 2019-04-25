@@ -10,6 +10,21 @@ from bokeh.embed import components
 
 app = Flask(__name__)
 
+location = ['mosque', 'picket fence', 'park bench', 'sunglasses', 'cliff',
+            'seat belt', 'sunglass', 'shower curtain', 'sunscreen', 'seashore',
+            'lakeside', 'promontory']
+animals = ['American Staffordshire terrier', 'tench', 'gar', 'papillon',
+           'golden retriever', 'chimpanzee']
+sociability = []
+sports = ['ballplayer']
+fashion = ['swimming trunks', 'sweatshirt', 'jean', 'Windsor tie', 'pajama'
+           'bikini', 'sombrero', 'cardigan', 'miniskirt', 'jersey', 'suit']
+
+location_individual = []
+animals_individual = []
+sociability_individual = []
+fashion_individual = []
+
 
 ################################## WOMEN #####################################
 likes_women = ['woman']
@@ -27,10 +42,7 @@ df_women = df_women[['File Name', 'Truncated Description', 'Certainty']]
 df1_women = df_women.groupby(['File Name'])['Truncated Description'].apply(list).reset_index() # reset_index() restores dataframe to conventional structure
 df_certainty_women = df_women.groupby(['File Name'])['Certainty'].apply(list).reset_index()
 df1_women = df1_women.join(df_certainty_women['Certainty'])   # adding the list of certainties
-# Dropping duplicates from the list of descriptions of each image:
-df1_women['Truncated Description'] = list(map(set, df1_women['Truncated Description']))
-# Converting set (description) into list:
-df1_women['Truncated Description'] = df1_women['Truncated Description'].apply(list)
+
 
 ################################### MEN ######################################
 likes_men = ['man']
@@ -48,24 +60,39 @@ df_men = df_men[['File Name', 'Truncated Description', 'Certainty']]
 df1_men = df_men.groupby(['File Name'])['Truncated Description'].apply(list).reset_index() # reset_index() restores dataframe to conventional structure
 df_certainty_men = df_men.groupby(['File Name'])['Certainty'].apply(list).reset_index()
 df1_men = df1_men.join(df_certainty_men['Certainty'])   # adding the list of certainties
-# Dropping duplicates from the list of descriptions of each image:
-df1_men['Truncated Description'] = list(map(set, df1_men['Truncated Description']))
-# Converting set (description) into list:
-df1_men['Truncated Description'] = df1_men['Truncated Description'].apply(list)
+
+
 ##############################################################################
 
 
 
 def obtain_score(file_name, gender):
+    index_value = []
+    objects = []
+    score_image = 0
     if gender == 'women':         
         file_index = df1_women['File Name'][df1_women['File Name'] == file_name].index[0] # index value of the file
         file_values = df1_women['Truncated Description'][file_index]
+        score = df1_women['Certainty'][file_index]
+        for i in range(0, len(file_values)):
+            if score[i] > 0.2:
+                index_value.append(i)
+                objects.append(file_values[i])
+                score_image = score_image + score[i]
         
     if gender == 'men':         
         file_index = df1_men['File Name'][df1_men['File Name'] == file_name].index[0] # index value of the file
         file_values = df1_men['Truncated Description'][file_index]
+        score = df1_men['Certainty'][file_index]
+        for i in range(0, len(file_values)):
+            if score[i] > 0.2:
+                index_value.append(i)
+                objects.append(file_values[i])
+                score_image = score_image + score[i]
+                
+    objects = list(set(objects))
     
-    return file_values
+    return objects
 
 def choose_random(gender):
     if gender == 'women':
@@ -82,15 +109,29 @@ def save_image_sequence(image_file, gender):
         image_sequence_women.append(image_file)
     if gender == 'men':
         image_sequence_men.append(image_file)
+        
     
-def save_likes(image_sequence, gender):
+def save_likes(image_sequence, gender, objects):
     if gender == 'women':
         likes_women.append(image_sequence)
     if gender == 'men':
         likes_men.append(image_sequence)
         
-    print(likes_women)
-    print(likes_men)
+    for i in range(0, len(objects)):
+        
+        if (objects[i] in location) == True:
+            location_individual.append(objects[i])
+        if (objects[i] in animals) == True:
+            animals_individual.append(objects[i])
+        if (objects[i] in location) == True:
+            sociability_individual.append(objects[i])
+        if (objects[i] in fashion) == True:
+            fashion_individual.append(objects[i])
+        
+    print(location_individual)
+    print(fashion_individual)
+#    print(likes_women)
+#    print(likes_men)
 
 def bokehplot(image_name, gender):
     
@@ -137,16 +178,21 @@ def index():
         save_image_sequence(image_file, gender)
         
         
+        
         # Saving liked images:
         if request.form.get("liked_image"):
+            
             if len(image_sequence_women)==1:
                 pass
             if gender == 'women':
-                save_likes(image_sequence_women[-2], gender)
+                objects = obtain_score(image_sequence_women[-2].rsplit( ".", 1 )[ 0 ], gender)
+                save_likes(image_sequence_women[-2], gender, objects)
+                
             if len(image_sequence_men)==1:
                 pass
             if gender == 'men':
-                save_likes(image_sequence_men[-2], gender)               
+                objects = obtain_score(image_sequence_men[-2].rsplit( ".", 1 )[ 0 ], gender)
+                save_likes(image_sequence_men[-2], gender, objects)
             
         
         fig = bokehplot(image_file, gender)
