@@ -7,18 +7,37 @@ from PIL import Image
 from flask import Flask, render_template, request, redirect
 from bokeh.plotting import figure, show, output_notebook
 from bokeh.embed import components
+from bokeh.models import HoverTool
+from bokeh.layouts import row, column
 
 app = Flask(__name__)
 
 location = ['mosque', 'picket fence', 'park bench', 'sunglasses', 'cliff',
             'seat belt', 'sunglass', 'shower curtain', 'sunscreen', 'seashore',
-            'lakeside', 'promontory']
-animals = ['American Staffordshire terrier', 'tench', 'gar', 'papillon',
-           'golden retriever', 'chimpanzee']
+            'lakeside', 'promontory', 'seashore', 'valley', 'alp', 'restaurant'
+            'pier', 'window shade', 'shower curtain', 'cliff dwelling']
+
+animals = ['American Staffordshire terrier', 'papillon', 'Mexican hairless',
+           'golden retriever', 'French bulldog', 'German shepherd', 
+           'Italian greyhound', 'Arabian camel', 'Siberian husky',
+           'Bernese mountain dog', 'Rhodesian ridgeback', 'Shetland sheepdog',
+           'Tibetan mastiff', 'Old English sheepdog', 'Scottish deerhound',
+           'Scottish deerhound', 'Afghan hound', 'English setter',
+           'Irish terrier', 'Pomeranian', 'Norwegian elkhound', 'Irish setter',
+           'English springer', 'Irish wolfhound', 'German short-haired pointer', 
+           'Persian cat', 'Egyptian cat', 
+           'chimpanzee', 'tench', 'gar', 'African grey']
+
 sociability = []
-sports = ['ballplayer']
+
+sports = ['ballplayer', 'barbell', 'dumbbell', 'snorkel', 'ski', 'snowmobile' ]
+
 fashion = ['swimming trunks', 'sweatshirt', 'jean', 'Windsor tie', 'pajama'
-           'bikini', 'sombrero', 'cardigan', 'miniskirt', 'jersey', 'suit']
+           'bikini', 'sombrero', 'cardigan', 'miniskirt', 'jersey', 'suit', 
+           'mortarboard', 'shower cap', 'bikini', 'bonnet', 'stole', 'fur coat'
+           'academic gown', 'brassiere', 'trench coat']
+
+misc = ['cellular telephone', 'television', 'beer glass']
 
 location_individual = []
 animals_individual = []
@@ -146,8 +165,50 @@ def bokehplot(image_name, gender):
     title = str(obtain_score(image_name.rsplit( ".", 1 )[ 0 ], gender))   # Stripping .jpeg extension
     plot = figure(x_range=(0,1), y_range=(0,1), plot_width=400, plot_height=400, title=title)
     plot.image_rgba(image=[imarray], x=0, y=0, dw=1, dh=1)
-    plot.title.text_font_size = '8pt'
+    plot.title.text_font_size = '10pt'
+    plot.title.text_color = "#ffffff"
+    plot.background_fill_color = "#234567"
+    plot.border_fill_color = "#234567"
+    plot.toolbar.logo = None
+    plot.toolbar_location = None
+    plot.axis.visible = False
     
+    
+    """
+    df = pd.read_csv('men.csv')
+    df1 = df.groupby(['Truncated Description']).size().reset_index()
+    df1 = df1.sort_values([0], ascending = False).reset_index()
+    df1.rename(columns={0:'count', 'Truncated Description':'truncated_description'}, inplace=True)   # Rename headers
+    df1 = df1[0:50]
+    
+    
+    description_array = df1['truncated_description'].tolist()
+    
+    
+    p = figure(x_range=description_array, width=400, height=400, title="Top 50 Classifications", tools="",background_fill_color='#440154')
+    
+    hover = HoverTool(tooltips = [
+        ('Item', '@truncated_description'),
+        ('Count', '@count')])
+    
+    
+    p.add_tools(hover)
+    
+    p.grid.visible = False
+    
+    p.vbar(top = 'count', x='truncated_description', width=0.8, source=df1, hover_color="pink", hover_alpha=0.8)
+    
+    p.y_range.start = 0
+    p.xaxis.axis_label = "Classification"
+    p.yaxis.axis_label = "Count"
+    p.xaxis.major_label_orientation = 1
+    p.xgrid.grid_line_color = None
+    
+    p.toolbar.logo = None
+    p.toolbar_location = None
+    
+    layout = column(plot, p)
+    """
     return plot
 
 def invalid():
