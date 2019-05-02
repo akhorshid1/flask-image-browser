@@ -12,10 +12,22 @@ from bokeh.layouts import row, column
 
 app = Flask(__name__)
 
-location = ['mosque', 'picket fence', 'park bench', 'sunglasses', 'cliff',
-            'seat belt', 'sunglass', 'shower curtain', 'sunscreen', 'seashore',
-            'lakeside', 'promontory', 'seashore', 'valley', 'alp', 'restaurant'
-            'pier', 'window shade', 'shower curtain', 'cliff dwelling']
+
+indoor  = ['shower curtain', 'restaurant', 'window shade', 'shower curtain',
+           'cellular telephone', 'barbershop', 'barbell', 'dumbbell',
+           'television', 'prison', 'coho', 'bath towel', 'remote control',
+           'bannister', 'beer glass', 'medicine chest', 'library',
+           'butternut squash', 'punching bag', 'bathtub', 'refrigerator',
+           'wardrobe', 'bookshop', 'studio couch', 'monitor']
+
+outdoor = ['mosque', 'picket fence', 'park bench', 'pier', 'sunscreen', 
+           'seashore', 'cliff', 'seat belt', 'sunglass', 'sunglasses',
+           'seashore', 'valley', 'alp', 'lakeside', 'promontory', 
+           'cliff dwelling', 'bikini', 'valley', 'barracouta', 'gar',
+           'mountain bike', 'sleeping bag', 'crash helmet', 'sturgeon',
+           'sandbar', 'snorkel', 'motor scooter', 'ski', 'snowmobile', 'racket',
+           'umbrella', 'lumbermill', 'basketball', 'backpack', 'convertible',
+           'street sign', 'fountain', 'palace', 'car wheel','volcano']
 
 animals = ['American Staffordshire terrier', 'papillon', 'Mexican hairless',
            'golden retriever', 'French bulldog', 'German shepherd', 
@@ -24,7 +36,9 @@ animals = ['American Staffordshire terrier', 'papillon', 'Mexican hairless',
            'Tibetan mastiff', 'Old English sheepdog', 'Scottish deerhound',
            'Scottish deerhound', 'Afghan hound', 'English setter',
            'Irish terrier', 'Pomeranian', 'Norwegian elkhound', 'Irish setter',
-           'English springer', 'Irish wolfhound', 'German short-haired pointer', 
+           'English springer', 'Irish wolfhound', 'German short-haired pointer',
+           'dalmatian', 'French bulldog', 'Labrador retriever', 
+           'Staffordshire bullterrier',
            'Persian cat', 'Egyptian cat', 
            'chimpanzee', 'tench', 'gar', 'African grey']
 
@@ -37,13 +51,13 @@ fashion = ['swimming trunks', 'sweatshirt', 'jean', 'Windsor tie', 'pajama'
            'mortarboard', 'shower cap', 'bikini', 'bonnet', 'stole', 'fur coat'
            'academic gown', 'brassiere', 'trench coat']
 
-misc = ['cellular telephone', 'television', 'beer glass']
+misc = ['cellular telephone', 'television', 'beer glass', 'beer bottle']
 
-location_individual = []
-animals_individual = []
+indoor_individual = []
+outdoor_individual = []
 sociability_individual = []
 fashion_individual = []
-
+animals_individual = []
 
 ################################## WOMEN #####################################
 likes_women = ['woman']
@@ -119,7 +133,7 @@ def choose_random(gender):
         image_name = files_women.pop(random.randrange(len(files_women)))
     if gender == 'men':
         # The most pythonic way to pop a random element from a list:
-        image_name = files_men.pop(random.randrange(len(files_men)))   
+        image_name = files_men.pop(random.randrange(len(files_men)))
 
     return image_name 
 
@@ -128,6 +142,7 @@ def save_image_sequence(image_file, gender):
         image_sequence_women.append(image_file)
     if gender == 'men':
         image_sequence_men.append(image_file)
+#        df1_men = [df1_men[df1_men['File Name']!= image_name.rsplit( ".", 1 )[ 0 ] ] ]
         
     
 def save_likes(image_sequence, gender, objects):
@@ -138,17 +153,18 @@ def save_likes(image_sequence, gender, objects):
         
     for i in range(0, len(objects)):
         
-        if (objects[i] in location) == True:
-            location_individual.append(objects[i])
+        if (objects[i] in indoor) == True:
+            indoor_individual.append(objects[i])
         if (objects[i] in animals) == True:
             animals_individual.append(objects[i])
-        if (objects[i] in location) == True:
-            sociability_individual.append(objects[i])
+        if (objects[i] in outdoor) == True:
+            outdoor_individual.append(objects[i])
         if (objects[i] in fashion) == True:
             fashion_individual.append(objects[i])
-        
-    print(location_individual)
-    print(fashion_individual)
+                    
+    print(indoor_individual)
+    print(outdoor_individual)
+    print(animals_individual)
 #    print(likes_women)
 #    print(likes_men)
 
@@ -162,54 +178,98 @@ def bokehplot(image_name, gender):
     im = im.convert("RGBA")
     imarray = np.array(im)
     imarray = imarray[::-1]
-    title = str(obtain_score(image_name.rsplit( ".", 1 )[ 0 ], gender))   # Stripping .jpeg extension
-    plot = figure(x_range=(0,1), y_range=(0,1), plot_width=400, plot_height=400, title=title)
-    plot.image_rgba(image=[imarray], x=0, y=0, dw=1, dh=1)
-    plot.title.text_font_size = '10pt'
+    title = str(obtain_score(image_name.rsplit( ".", 1 )[ 0 ], gender))   
+    # Stripping .jpeg extension
+    plot = figure(x_range=(0,1), y_range=(0,1), plot_width=400,
+                  plot_height=400, title=title)
+    plot.title.text_font_size = '12pt'
     plot.title.text_color = "#ffffff"
+    plot.title.align = 'center'
+    plot.image_rgba(image=[imarray], x=0, y=0, dw=1, dh=1)
     plot.background_fill_color = "#234567"
     plot.border_fill_color = "#234567"
+#    plot.min_border = 80
+   
     plot.toolbar.logo = None
     plot.toolbar_location = None
     plot.axis.visible = False
     
-    
-    """
-    df = pd.read_csv('men.csv')
-    df1 = df.groupby(['Truncated Description']).size().reset_index()
-    df1 = df1.sort_values([0], ascending = False).reset_index()
-    df1.rename(columns={0:'count', 'Truncated Description':'truncated_description'}, inplace=True)   # Rename headers
-    df1 = df1[0:50]
-    
-    
-    description_array = df1['truncated_description'].tolist()
+
+#    df = pd.read_csv('men.csv')
+#    df1 = df.groupby(['Truncated Description']).size().reset_index()
+#    df1 = df1.sort_values([0], ascending = False).reset_index()
+#    df1.rename(columns={0:'count', 'Truncated Description':'truncated_description'}, inplace=True)   # Rename headers
+#    df1 = df1[0:50]
     
     
-    p = figure(x_range=description_array, width=400, height=400, title="Top 50 Classifications", tools="",background_fill_color='#440154')
-    
-    hover = HoverTool(tooltips = [
-        ('Item', '@truncated_description'),
-        ('Count', '@count')])
     
     
-    p.add_tools(hover)
+#    description_array = df1['truncated_description'].tolist()
+#    p = figure(x_range=description_array, width=600, height=500, title="Top 50 Classifications", tools="",background_fill_color='#440154')
+#    
+#    hover = HoverTool(tooltips = [
+#        ('Item', '@truncated_description'),
+#        ('Count', '@count')])
+#    
+#    
+#    p.add_tools(hover)
+#    
+#    p.grid.visible = False
+#    
+#    p.vbar(top = 'count', x='truncated_description', width=0.8, source=df1, hover_color="pink", hover_alpha=0.8)
+#    
+#    p.y_range.start = 0
+#    p.xaxis.axis_label = "Classification"
+#    p.yaxis.axis_label = "Count"
+#    p.xaxis.major_label_orientation = 1
+#    p.xgrid.grid_line_color = None
+#    
+#    p.toolbar.logo = None
+#    p.toolbar_location = None
+    
+    categories = ['Indoor', 'Outdoor', 'Pets']
+    
+    A = len(outdoor_individual)
+    B = len(indoor_individual)
+    
+    count = [A,B,3]
+    
+    
+    p = figure(x_range=categories, width=400, height=400, title="Statistics", tools="",background_fill_color='#440154')
     
     p.grid.visible = False
     
-    p.vbar(top = 'count', x='truncated_description', width=0.8, source=df1, hover_color="pink", hover_alpha=0.8)
+    p.vbar(top = count, x=categories, width=0.8, hover_color="pink", hover_alpha=0.8)
     
     p.y_range.start = 0
     p.xaxis.axis_label = "Classification"
-    p.yaxis.axis_label = "Count"
+    p.yaxis.axis_label = "Count"    
     p.xaxis.major_label_orientation = 1
     p.xgrid.grid_line_color = None
+    p.background_fill_color = "#440154"
+    p.border_fill_color = "#234567"
+    p.title.text_color = "#ffffff"
+    p.title.text_font_size = "1.25em"
+    p.axis.major_label_text_color = "#ffffff"
+    p.axis.major_label_text_font_size = "0.75em"
+    p.axis.axis_line_color = "#ffffff"
+    p.axis.major_tick_line_color = "#ffffff"
+    p.axis.minor_tick_line_color = "#ffffff"
+    p.yaxis.axis_label_text_font_size = "1em"
+    p.yaxis.axis_label_text_font_style = "normal"
+    p.xaxis.axis_label_text_font_size = "1em"
+    p.xaxis.axis_label_text_font_style = "normal"
+    p.xaxis.axis_label_standoff = 12
+    p.yaxis.axis_label_standoff = 12
+    p.xaxis.axis_label_text_color = "#ffffff"
+    p.yaxis.axis_label_text_color = "#ffffff"
     
     p.toolbar.logo = None
     p.toolbar_location = None
     
     layout = column(plot, p)
-    """
-    return plot
+
+    return layout
 
 def invalid():
     error = None
