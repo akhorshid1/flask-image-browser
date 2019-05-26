@@ -13,7 +13,7 @@ body {
 }
 
 #next {
-    font-size: 1.5em;
+    font-size: 1.25em;
     vertical-align: middle;
 }
     
@@ -50,7 +50,7 @@ body {
 }
 
 .bk-root::after {
-    content: "Swiper";
+    content: "";
     float: right;
     color: #ffffff;
 }
@@ -78,11 +78,11 @@ input[type=submit] {
     border-style: none;
     vertical-align: middle;
     outline: none;
-    box-shadow: 0 4px 	#000000;  
+    box-shadow: 0 4px 	#696969;  
 }
 
 input[type=submit]:focus {
-    box-shadow: 0 0 0 2px #ffffff;
+    box-shadow: 0 0 0 2px #000000;
 }
 
 
