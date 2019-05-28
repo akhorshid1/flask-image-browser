@@ -22,7 +22,7 @@ indoor  = set(['shower curtain', 'restaurant', 'window shade', 'shower curtain',
            'theater curtain', 'washbasin', 'hand blower', 'shopping basket',
            'microwave', 'wine bottle', 'dishwasher', 'wooden spoon',
            'window screen', 'soap dispenser', 'beer bottle', 'television',
-           'toilet seat', 'sliding door'])
+           'toilet seat', 'sliding door', 'menu', 'crib'])
 
 outdoor = set(['mosque', 'picket fence', 'park bench', 'pier', 'sunscreen', 
            'seashore', 'cliff', 'seat belt', 'sunglass', 'sunglasses',
