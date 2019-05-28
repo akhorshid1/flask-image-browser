@@ -1,39 +1,31 @@
-# Flask on Heroku
+# The Data Incubator Capstone Project
 
-This project is intended to help you tie together some important concepts and
-technologies from the 12-day course, including Git, Flask, JSON, Pandas,
-Requests, Heroku, and Bokeh for visualization.
+This project proposes an alternative method to input the user's preferences in 
+dating apps using image recognition. The final product is an app that can be deployed
+as a flask on Spyder by running the file **app.py**. The free Heroku profile would not
+accept a large dataset for full online deployment. Also, please keep in mind that
+github reduced the dataset size from 5000-6000 images to 1000 images for both men and women.
 
-The repository contains a basic template for a Flask configuration that will
-work on Heroku.
+## 1: Download
 
-A [finished example](https://lemurian.herokuapp.com) that demonstrates some basic functionality.
+- Download this repository by cloning "https://github.com/akhorshid1/flask-image-browser.git"
 
-## Step 1: Setup and deploy
-- Git clone the existing template repository.
-- `Procfile`, `requirements.txt`, `conda-requirements.txt`, and `runtime.txt`
-  contain some default settings.
-- There is some boilerplate HTML in `templates/`
-- Create Heroku application with `heroku create <app_name>` or leave blank to
-  auto-generate a name.
-- (Suggested) Use the [conda buildpack](https://github.com/kennethreitz/conda-buildpack).
-  If you choose not to, put all requirements into `requirements.txt`
+## 2: Image Processing
 
-  `heroku config:add BUILDPACK_URL=https://github.com/kennethreitz/conda-buildpack.git`
-- *Question*: What are the pros and cons of using conda vs. pip?
-- Deploy to Heroku: `git push heroku master`
-- You should be able to see your site at `https://<app_name>.herokuapp.com`
-- A useful reference is the Heroku [quickstart guide](https://devcenter.heroku.com/articles/getting-started-with-python-o).
+- All the processing has been already done for the images stored in this repository, so the
+previous steps should only be performed if the user wishes to process a new dataset.
+- The **classify_image_oop.py** contains the basic components for the ImageNet model
+used for image classification in an objected oriented format. This code will download 
+the ImageNet model in your /tmp folder if it does not already exist.
+- Running the **main.py** file will slice the entire image dataset in the *data_dir* directory
+and output all the sliced images in the *output_dir* directory. This code will only run if the
+module image_slice is installed ($ pip install image_slicer). Once the slicing is done,
+the code will call on **classify_image_oop.py** to predict the class of the entire dataset
+and append the results to a .csv file that will get stored locally. 
+The results include the prediction with the highest certainty and the score from the ImageNet model prediction.
+- Warning: processing a dataset could take hours, so keep this in mind before doing so!
 
-## Step 2: Get data from API and put it in pandas
-- Use the `requests` library to grab some data from a public API. This will
-  often be in JSON format, in which case `simplejson` will be useful.
-- Build in some interactivity by having the user submit a form which determines which data is requested.
-- Create a `pandas` dataframe with the data.
-
-## Step 3: Use Bokeh to plot pandas data
-- Create a Bokeh plot from the dataframe.
-- Consult the Bokeh [documentation](http://bokeh.pydata.org/en/latest/docs/user_guide/embed.html)
-  and [examples](https://github.com/bokeh/bokeh/tree/master/examples/embed).
-- Make the plot visible on your website through embedded HTML or other methods - this is where Flask comes in to manage the interactivity and display the desired content.
-- Some good references for Flask: [This article](https://realpython.com/blog/python/python-web-applications-with-flask-part-i/), especially the links in "Starting off", and [this tutorial](https://github.com/bev-a-tron/MyFlaskTutorial).
+## 3: Deploy the App
+- Simply run the **app.py** in a spyder kernel, which will produce a local link to use the app
+in your browser
+- Ex: "* Running on http://127.0.0.1:33507/ (Press CTRL+C to quit)"
