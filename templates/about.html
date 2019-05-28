@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Skeleton application demoing Heroku and Flask integration.">
+    <meta name="author" content="@gotoariel">
+    <!-- <link rel="icon" href="favicon.ico"> -->
+
+    <title>About, Dating App TDI</title>
+    <link href="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.css"
+	  rel="stylesheet" type="text/css">
+    <script src="http://cdn.pydata.org/bokeh/release/bokeh-0.12.6.min.js"></script>
+    
+    {{ bokeh_script|indent(10)|safe }}
+    
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 text-left">
+          <h2>About</h2>
+          <p><a href="/">Home</a></p>
+          <p>Online dating is becoming more popular with over 50 million 
+          Americans having tried it at some point. 
+          Dating apps tend to have negative reputation and not be taken 
+          seriously. One problem with dating apps is that a lot of users are 
+          complacent to manually enter the preferences making it hard to 
+          suggest good matches. The app will learn about the user's swiping 
+          patterns using image recognition.</p>
+          
+          <p>I am using Tensor Flow’s ImageNet library to classify the images,
+          which does not need a powerful GPU. The code can
+          detect multiple objects in a single image by slicing the image
+          into a grid. ImageNet has 1000 classifiers and can identify objects 
+          such as sunglasses or cars, locations such as cliffs or beaches, and
+          animals such as dogs or cats. As the user starts browsing profiles, 
+          the code will start learning his or her preferences based on the identified 
+          objects in the profiles they like. For instance, the code will recognize
+          that the user is inclined to like pets, or that 
+          they like sports, or simply like people who spend a lot
+          of time outdoors.</p>
+          
+          <img src="/static/identification_grid.jpg" alt="Image Grid" 
+          width="500" height="400">
+
+          <p>My classification system contains 3 main classes used to build 
+          a profile for the user. The first class is location, which determines 
+          if the user prefers the indoors or outdoors, and what kind of location 
+          they prefer. The second class is pets, which will gauge how much they 
+          like pets, then identify their favorite pet whether it’s dogs or cats 
+          down to the breed. The third class is sports, which keeps track of 
+          the physical activities they like.</p>
+          
+          <p>For demonstration, I classified objects in 5000 images of men, and
+          6000 images of women scraped from the popular dating app Tinder. The results
+          are stored in a .csv file separately to allow for faster processing in the 
+          website. The code used for processing and parsing the results can be
+          found in the folder /image_processing.</p>
+          
+          <p>The following bar plots show the top 50 identified objects for men
+          vs. the top 50 identified objects for women:</p>
+          
+
+        </div>
+      </div>
+    </div>
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  {{ bokeh_div|indent(10)|safe }}
+  </body>
+</html>

@@ -2,6 +2,10 @@ body {
     background-color: #234567;
 }
 
+p { 
+ color: #ffffff; 
+}
+
 .bk-plot-layout.bk-layout-fixed {
     margin: auto;
 }
